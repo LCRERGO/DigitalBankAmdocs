@@ -1,9 +1,11 @@
 package DigitalBankAmdocs;
 
+import static java.lang.Math.pow;
+import static java.lang.Math.abs;
+
 public abstract class Account implements IAccount {
-    /* TODO: alter sequence number algorithm */
-    private static final int DEFAULT_AGENCY = 1;
-    private static int SEQUENCE_NUMBER = 1;
+    private static final int DEFAULT_AGENCY = 1000;
+    private static long SEQUENCE_NUMBER = 42;
 
     protected int agency;
     protected int number;
@@ -12,8 +14,8 @@ public abstract class Account implements IAccount {
 
     public Account(Client client) {
         agency = Account.DEFAULT_AGENCY;
-        number = SEQUENCE_NUMBER++;
-        client = client;
+        number = abs((int)getSequenceNumber() % 4000000);
+        this.client = client;
     }
 
     @Override
@@ -38,9 +40,18 @@ public abstract class Account implements IAccount {
 
     @Override
     public void printExtract() {
-        System.out.println(String.format("Holder: %s", client.getName()));
-        System.out.println(String.format("Agency: %d", agency));
-        System.out.println(String.format("Number: %d", number));
-        System.out.println(String.format("Balance: %d", balance));
+        System.out.println("Holder: " +  client.getName());
+        System.out.println("Agency: " + agency);
+        System.out.println("Number: " +  number);
+        System.out.println("Balance: " + balance);
+    }
+
+    private long getSequenceNumber() {
+        final long modulus = (long)pow(2, 48);
+        final long a = 252149039;
+        final long c = 11;
+
+        SEQUENCE_NUMBER = ((a * SEQUENCE_NUMBER + c) % modulus);
+        return SEQUENCE_NUMBER;
     }
 }
